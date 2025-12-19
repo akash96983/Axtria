@@ -43,32 +43,35 @@ def retrieve_excel(drug_name: str, intents: set):
     # 1. Indication & Population
     indication = record.get('indication', 'N/A')
     population = record.get('population', 'N/A')
-    if "indication" in intents:
-        response_parts.append(f"Indication: {indication} (Population: {population})")
+    
+    # If specific intents are present, we ONLY add those
+    # If no specific intents match our drug columns, we fall back to full data
+    
+    full_data_requested = not any(i in intents for i in ["indication", "population", "dosage", "adverse_events", "severity", "outcome"])
+
+    if full_data_requested or "indication" in intents:
+        response_parts.append(f"Indication: {indication}")
+    
+    if full_data_requested or "population" in intents:
+        response_parts.append(f"Population: {population}")
     
     # 2. Dosage
-    if "dosage" in intents:
+    if full_data_requested or "dosage" in intents:
         response_parts.append(f"Dose: {record.get('dose', 'N/A')}")
         
     # 3. Adverse Events & Severity
     ae_terms = record.get('ae_terms', 'N/A')
     severity = record.get('severity', 'N/A')
-    if "adverse_events" in intents:
-        response_parts.append(f"AEs: {ae_terms} (Severity: {severity})")
+    
+    if full_data_requested or "adverse_events" in intents:
+        response_parts.append(f"AEs: {ae_terms}")
+        
+    if full_data_requested or "severity" in intents:
+        response_parts.append(f"Severity: {severity}")
         
     # 4. Outcome
-    outcome = record.get('outcome', 'N/A')
-    if "outcome" in intents:
-        response_parts.append(f"Outcome: {outcome}")
-        
-    # Default fallback if no specific intent matches columns but we have the drug
-    if not response_parts:
-         response_parts.append(f"Indication: {indication}")
-         response_parts.append(f"Population: {population}")
-         response_parts.append(f"Dose: {record.get('dose', 'N/A')}")
-         response_parts.append(f"AEs: {ae_terms}")
-         response_parts.append(f"Severity: {severity}")
-         response_parts.append(f"Outcome: {outcome}")
+    if full_data_requested or "outcome" in intents:
+        response_parts.append(f"Outcome: {record.get('outcome', 'N/A')}")
 
     final_text = f"Data for {actual_drug}:\n" + "\n".join(response_parts)
     
