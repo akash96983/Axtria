@@ -2,14 +2,9 @@ import React, { useState, useRef } from 'react';
 import ChatWindow from '../components/ChatWindow';
 import InputBox from '../components/InputBox';
 
-export default function Home() {
-    const [messages, setMessages] = useState([]);
-    const [inputText, setInputText] = useState('');
+export default function Home({ messages, setMessages, sessionIdRef }) {
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef(null);
-
-    // Session ID Management
-    const sessionIdRef = useRef(`session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

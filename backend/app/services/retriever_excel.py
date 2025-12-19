@@ -40,23 +40,35 @@ def retrieve_excel(drug_name: str, intents: set):
     # Build response based on intents
     response_parts = []
     
-    # Column mapping (Layer 5 idea)
-    # Map normalized intents to DataFrame columns
-    if "adverse_events" in intents:
-        response_parts.append(f"AEs: {record.get('ae_terms', 'N/A')} (Severity: {record.get('severity', 'N/A')})")
+    # 1. Indication & Population
+    indication = record.get('indication', 'N/A')
+    population = record.get('population', 'N/A')
+    if "indication" in intents:
+        response_parts.append(f"Indication: {indication} (Population: {population})")
     
+    # 2. Dosage
     if "dosage" in intents:
         response_parts.append(f"Dose: {record.get('dose', 'N/A')}")
         
-    if "indication" in intents:
-        response_parts.append(f"Indication: {record.get('indication', 'N/A')}")
+    # 3. Adverse Events & Severity
+    ae_terms = record.get('ae_terms', 'N/A')
+    severity = record.get('severity', 'N/A')
+    if "adverse_events" in intents:
+        response_parts.append(f"AEs: {ae_terms} (Severity: {severity})")
         
+    # 4. Outcome
+    outcome = record.get('outcome', 'N/A')
     if "outcome" in intents:
-        response_parts.append(f"Outcome: {record.get('outcome', 'N/A')}")
+        response_parts.append(f"Outcome: {outcome}")
         
     # Default fallback if no specific intent matches columns but we have the drug
     if not response_parts:
-         response_parts.append(f"Indication: {record.get('indication')}, Dose: {record.get('dose')}, AEs: {record.get('ae_terms')}")
+         response_parts.append(f"Indication: {indication}")
+         response_parts.append(f"Population: {population}")
+         response_parts.append(f"Dose: {record.get('dose', 'N/A')}")
+         response_parts.append(f"AEs: {ae_terms}")
+         response_parts.append(f"Severity: {severity}")
+         response_parts.append(f"Outcome: {outcome}")
 
     final_text = f"Data for {actual_drug}:\n" + "\n".join(response_parts)
     
