@@ -4,7 +4,8 @@ export default function Logs() {
     const [logs, setLogs] = React.useState([]);
 
     React.useEffect(() => {
-        fetch('http://localhost:8000/api/logs')
+        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+        fetch(`${apiBaseUrl}/api/logs`)
             .then(res => res.json())
             .then(data => setLogs(data))
             .catch(err => console.error("Failed to load logs", err));
